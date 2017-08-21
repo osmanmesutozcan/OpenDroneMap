@@ -20,8 +20,8 @@ class ODMeshingCell(ecto.Cell):
                                  'Increasing this value increases computation '
                                  'times slightly but helps reduce memory usage.', 9)
 
-        params.declare("remove_outliers", 'Percentage of outliers to remove from the point set. Set to 0 to disable. '
-                                          'Applies to 2.5D mesh only.', 2)
+        params.declare("remove_outliers", 'Percentage of outliers to remove from the point set. Set to 0 to disable. ', 2)
+
         params.declare("wlop_iterations", 'Iterations of the Weighted Locally Optimal Projection (WLOP) simplification algorithm. '
                                           'Higher values take longer but produce a smoother mesh. '
                                           'Applies to 2.5D mesh only. ', 70)
@@ -45,6 +45,7 @@ class ODMeshingCell(ecto.Cell):
         args = self.inputs.args
         tree = self.inputs.tree
         verbose = '-verbose' if self.params.verbose else ''
+        sorfilter = '-outliersRemoval' if self.params.remove_outliers else ''
 
         # define paths and create working directories
         system.mkdir_p(tree.odm_meshing)
@@ -71,6 +72,7 @@ class ODMeshingCell(ecto.Cell):
                 'max_vertex': self.params.max_vertex,
                 'oct_tree': self.params.oct_tree,
                 'samples': self.params.samples,
+                'remove_outliers': self.params.remove_outliers,
                 'solver': self.params.solver,
                 'verbose': verbose
             }
@@ -78,7 +80,7 @@ class ODMeshingCell(ecto.Cell):
             # run meshing binary
             system.run('{bin}/odm_meshing -inputFile {infile} '
                        '-outputFile {outfile} -logFile {log} '
-                       '-maxVertexCount {max_vertex} -octreeDepth {oct_tree} {verbose} '
+                       '-maxVertexCount {max_vertex} {remove_outliers} -octreeDepth {oct_tree} {verbose} '
                        '-samplesPerNode {samples} -solverDivide {solver}'.format(**kwargs))
         else:
             log.ODM_WARNING('Found a valid ODM Mesh file in: %s' %
