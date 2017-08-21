@@ -15,14 +15,12 @@ ExternalProject_Add(${_proj_name}
   SOURCE_DIR        ${SB_SOURCE_DIR}/${_proj_name}
   CMAKE_ARGS
     -DBUILD_features=OFF
-    -DBUILD_filters=OFF
     -DBUILD_geometry=OFF
     -DBUILD_keypoints=OFF
     -DBUILD_outofcore=OFF
     -DBUILD_people=OFF
     -DBUILD_recognition=OFF
     -DBUILD_registration=OFF
-    -DBUILD_sample_consensus=OFF
     -DBUILD_segmentation=OFF
     -DBUILD_features=OFF
     -DBUILD_surface_on_nurbs=OFF
