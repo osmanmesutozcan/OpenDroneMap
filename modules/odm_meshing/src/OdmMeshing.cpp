@@ -19,6 +19,9 @@ OdmMeshing::OdmMeshing() : log_(false)
     samplesPerNode_ = 1.0;
     decimationFactor_ = 0.0;
 
+    sorMeanK_ = 50;
+    sorStddevMulThresh_ = 1.0;
+
     logFilePath_ = "odm_meshing_log.txt";
     log_ << logFilePath_ << "\n";
 }
@@ -42,6 +45,8 @@ int OdmMeshing::run(int argc, char **argv)
         parseArguments(argc, argv);
 
         loadPoints();
+
+        applySORFilter();
 
         createMesh();
 
@@ -267,7 +272,26 @@ void OdmMeshing::printHelp()
     log_ << "Ocree depth at which the Laplacian equation is solved in the surface reconstruction step.\n";
     log_ << "Increasing this value increases computation times slightly but helps reduce memory usage.\n\n";
 
+    log_ << "\"-ourlierRemoval\" (optional)" << "\n";
+    log_ << "Filters outlier points using Statistical Outlier Removal filter.\n\n";
+
     log_.setIsPrintingInCout(printInCoutPop);
+}
+
+void OdmMeshing::applySORFilter()
+{
+    pcl::PointCloud<pcl::PointNormal>::Ptr points_filtered (new pcl::PointCloud<pcl::PointNormal>);
+    pcl::StatisticalOutlierRemoval<pcl::PointNormal> sorfilter;
+
+    log_ << "Removing outlier points.\n";
+
+    sorfilter.setInputCloud (points_);
+    sorfilter.setMeanK (sorMeanK_);
+    sorfilter.setStddevMulThresh (sorStddevMulThresh_);
+    sorfilter.filter (*points_filtered);
+
+    log_ << "Removed total of " << points_->size() - points_filtered->size() << " points.\n";
+    points_ = points_filtered;
 }
 
 void OdmMeshing::createMesh()

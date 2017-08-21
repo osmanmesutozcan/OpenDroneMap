@@ -8,6 +8,7 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/surface/poisson.h>
 #include <pcl/surface/vtk_smoothing/vtk_mesh_quadric_decimation.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 
 // Logging
 #include "Logger.hpp"
@@ -42,6 +43,8 @@ private:
      * \param   argv    Argument values.
      */
     void parseArguments(int argc, char** argv);
+
+    void applySORFilter();
 
     /*!
      * \brief createMesh    Sets up the pcl::Poisson meshing class using provided arguments and calls
@@ -98,6 +101,9 @@ private:
     double samplesPerNode_;     /**< Samples per octree node.*/
     double solverDivide_;       /**< Depth at which the Laplacian equation solver is run during surface estimation.*/
     double decimationFactor_;   /**< Percentage of points to remove when decimating the mesh. */
+
+    unsigned int sorMeanK_;     /**< Set the number of points (k) to use for mean distance estimation. */
+    double sorStddevMulThresh_; /**< Set the standard deviation multiplier threshold. */
 };
 
 /*!
